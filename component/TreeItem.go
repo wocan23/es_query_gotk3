@@ -69,14 +69,14 @@ func CreateTree() *gtk.Box{
 	if err != nil {
 		log.Fatal("Could not get tree selection object.")
 	}
-	selection.SetMode(gtk.SELECTION_SINGLE)
+	selection.SetMode(gtk.SELECTION_BROWSE)
 	selection.Connect("changed", treeSelectionChangedCB)
 
 	// treeview
 	treeView.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
 	treeView.SetMarginTop(5)
 	treeView.SetEnableSearch(true)
-	treeView.SetSearchColumn(1)
+	treeView.SetSearchColumn(0)
 	treeView.SetHAlign(gtk.ALIGN_START)
 
 	searchEntity,_ := gtk.EntryNew()
@@ -98,6 +98,7 @@ func createItemColumn(title string, id int) *gtk.TreeViewColumn {
 	col.PackEnd(cell, false)
 	col.AddAttribute(cell, "text", 1)
 	col.SetFixedWidth(common.WindowLeftWidth)
+	col.SetClickable(true)
 
 	//cellpb,_ := gtk.CellRendererPixbufNew()
 	//cell,_ := gtk.CellRendererTextNew()
