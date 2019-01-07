@@ -6,7 +6,7 @@ const (
 	WindowWidth = 1000
 	WindowHeight = 600
 
-	WindowLeftWidth = 300
+	WindowLeftWidth = 200
 	WindowLeftHeight = 700
 
 	SubWindowWidth = 400

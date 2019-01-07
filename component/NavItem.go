@@ -1,33 +1,30 @@
 package component
 
 import (
+	//"../common"
+	//"../helper"
 	"github.com/gotk3/gotk3/gtk"
+	"../helper"
 )
 
+func CreateNavItem(width int,height int,title string,imagePath string) *gtk.Button{
 
-/**
-	创建一个带图标文字带按钮
- */
-func GenerateNavItem(width int,height int,imagePath string,title string) *gtk.Button{
-	button,_ := gtk.BuilderNew()
+	btn,_ := gtk.ButtonNew()
 
-	//vBox := gtk.NewVBox(false,0)
-	//vBox.SetSizeRequest(width,height)
-	//
-	////image := helper.CreateImage(width-5,width-5,imagePath)
-	////image.SetSizeRequest(width,width)
-	//
-	//label := gtk.NewLabel(title)
-	//label.SetSizeRequest(width,height-width)
-	//label.Show()
-	//
-	////vBox.Add(image)
-	//vBox.Add(label)
-	//vBox.Show()
-	//
-	//button.Add(vBox)
-	//button.SetBorderWidth(0)
-	//button.SetVisible(true)
+	box,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+	box.SetHExpand(false)
+	box.SetVExpand(false)
 
-	return button
+	image := helper.CreateImage(width,width,imagePath)
+	box.Add(image)
+
+	label,_ := gtk.LabelNew(title)
+	box.Add(label)
+
+	btn.Add(box)
+	btn.ShowAll()
+	//btn.SetOpacity(0.5)
+	return btn
 }
+
+
