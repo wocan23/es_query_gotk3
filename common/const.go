@@ -7,14 +7,14 @@ const (
 	WindowHeight = 600
 
 	WindowLeftWidth = 200
-	WindowLeftHeight = 700
+	WindowLeftHeight = 500
 
 	SubWindowWidth = 400
 	SubWindowHeight = 600
 
 
-	NavItemWidth = 50
-	NavItemHeight = 70
+	NavItemWidth = 40
+	NavItemHeight = 60
 
 	FormItemWith = 160
 	FormItemHeight = 30

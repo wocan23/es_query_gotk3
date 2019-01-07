@@ -66,9 +66,15 @@ func CreateTree() *gtk.Box{
 	selection.SetMode(gtk.SELECTION_SINGLE)
 	selection.Connect("changed", treeSelectionChangedCB)
 
+	// treeview
+	treeView.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
+	treeView.SetMarginTop(20)
+	treeView.SetEnableSearch(true)
+	treeView.SetSearchColumn(2)
+
+
 	vBox.Add(treeView)
 	vBox.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
-	vBox.ShowAll()
 	return vBox
 }
 
@@ -87,7 +93,7 @@ func createTextColumn(title string, id int) *gtk.TreeViewColumn {
 	if err != nil {
 		log.Fatal("Unable to create cell column:", err)
 	}
-
+	column.SetSizing(gtk.TREE_VIEW_COLUMN_FIXED)
 	return column
 }
 
@@ -105,7 +111,8 @@ func createImageColumn(title string, id int) *gtk.TreeViewColumn {
 	if err != nil {
 		log.Fatal("Unable to create cell column:", err)
 	}
-
+	column.SetSizing(gtk.TREE_VIEW_COLUMN_FIXED)
+	column.SetFixedWidth(120)
 	return column
 }
 
