@@ -51,7 +51,7 @@ func CreateTree() *gtk.Box{
 
 	// todo data implements after
 	iter1 := addRow(treeStore, conpixbuf, "127.0.0.1                            ")
-	iter2 := addSubRow(treeStore, iter1, indexpixbuf, "test1-1")
+	iter2 := addSubRow(treeStore, iter1, indexpixbuf, "test1-1-------------------------------------1")
 	iter2 = addSubRow(treeStore, iter1, indexpixbuf, "test1-2")
 	addSubRow(treeStore, iter2, docpixbuf, "test1-2-1")
 	addSubRow(treeStore, iter2, docpixbuf, "test1-2-2")
@@ -80,8 +80,11 @@ func CreateTree() *gtk.Box{
 	treeView.SetHAlign(gtk.ALIGN_START)
 
 	searchEntity,_ := gtk.EntryNew()
-	searchEntity.SetSizeRequest(common.WindowLeftWidth,30)
+	searchEntity.SetSizeRequest(common.WindowLeftWidth,300)
+	searchEntity.SetText("dfsdf")
+	searchEntity.SetEditable(true)
 	treeView.SetSearchEntry(searchEntity)
+	treeView.ShowAll()
 
 	vBox.Add(treeView)
 	vBox.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
