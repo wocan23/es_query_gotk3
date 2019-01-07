@@ -72,8 +72,11 @@ func CreateLeft()*gtk.Box{
 
 	box.SetBorderWidth(2)
 
-	img := helper.CreateImage(common.WindowLeftWidth,common.WindowLeftHeight,"/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	box.Add(img)
+	tree := component.CreateTree()
+	box.Add(tree)
+
+	//img := helper.CreateImage(common.WindowLeftWidth,common.WindowLeftHeight,"/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
+	//box.Add(img)
 
 	box.SetMarginStart(20)
 
