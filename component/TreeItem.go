@@ -57,7 +57,7 @@ func CreateTree() *gtk.Box{
 	addSubRow(treeStore, iter2, docpixbuf, "test1-2-2")
 	addSubRow(treeStore, iter2, docpixbuf, "test1-2-3")
 	iter2 = addSubRow(treeStore, iter1, indexpixbuf, "test1-3")
-	iter1 = addRow(treeStore, conpixbuf, "10.70.93.52                           ")
+	iter1 = addRow(treeStore, conpixbuf, "122.122.122.122                           ")
 	iter2 = addSubRow(treeStore, iter1, indexpixbuf, "test2-1")
 	iter2 = addSubRow(treeStore, iter1, indexpixbuf, "test2-2")
 	iter2 = addSubRow(treeStore, iter1, indexpixbuf, "test2-3")
