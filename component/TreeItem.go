@@ -13,15 +13,6 @@ const (
 	COLUMN_TEXT
 )
 
-type TreeData struct{
-	TreeUnit TreeUnit
-	SubTreeData *TreeData
-}
-
-type TreeUnit struct{
-	ImagePath string
-	Text string
-}
 
 func CreateTree() *gtk.Box{
 	vBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
