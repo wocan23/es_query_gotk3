@@ -19,7 +19,7 @@ const (
 	FormItemWith = 160
 	FormItemHeight = 30
 
-	TreeItemWidth = 20
-	TreeItemHeight = 20
+	TreeItemWidth = 25
+	TreeItemHeight = 25
 
 )

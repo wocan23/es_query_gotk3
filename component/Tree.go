@@ -65,12 +65,11 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 	text := data.item.data["text"]
 	imagePath := data.item.data["imagePath"]
 	btn,_ := gtk.EventBoxNew()
-	btn.SetSizeRequest(100,20)
-
+	btn.SetSizeRequest(100,30)
 
 	btn.SetHExpand(false)
 
-	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,5)
+	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
 	var level = checkLevel(data)
 	for i := 0; i < level; i++{
 		_,height := box.GetSizeRequest()
@@ -102,6 +101,16 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 		}else{
 			unShowSubItems(current)
 		}
+		// 染色
+		cssProvider,_ := gtk.CssProviderNew()
+		cssProvider.LoadFromData(`Image{
+			background-color:blue;
+		}`)
+
+		screen,_ := btn.GetScreen()
+		btn.ResetStyle()
+		//style,_ := btn.GetStyleContext()
+		gtk.AddProviderForScreen(screen,cssProvider,1)
 	})
 	btn.Add(box)
 	btn.ShowAll()
@@ -113,15 +122,9 @@ func showSubItems(data *TreeData,root *gtk.Box,current *gtk.Box){
 	for _, e := range data.subItems {
 		pBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 
-		//_,height := pBox.GetSizeRequest()
-		//label,_ := gtk.LabelNew(">")
-		//label.SetSizeRequest(10,height)
-		//pBox.Add(label)
-
 		widget := GetWidget(e,root,pBox)
 
 		pBox.Add(widget)
-		pBox.SetMarginStart(10)
 		current.Add(pBox)
 	}
 	current.ShowAll()
