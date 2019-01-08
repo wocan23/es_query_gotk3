@@ -103,14 +103,18 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 		}
 		// 染色
 		cssProvider,_ := gtk.CssProviderNew()
-		cssProvider.LoadFromData(`Image{
+		cssProvider.LoadFromData(`.clicked{
 			background-color:blue;
 		}`)
 
+		/**
+		Using CSS (like a .mybutton { background-color: red; }) and loading these styles in as a global style, then getting the style context for your widget and calling btnStyleContext.AddClass("mybutton").
+		 */
 		screen,_ := btn.GetScreen()
-		btn.ResetStyle()
-		//style,_ := btn.GetStyleContext()
+		style,_ := btn.GetStyleContext()
 		gtk.AddProviderForScreen(screen,cssProvider,1)
+
+		style.AddClass("clicked")
 	})
 	btn.Add(box)
 	btn.ShowAll()
