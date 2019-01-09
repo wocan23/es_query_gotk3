@@ -5,6 +5,7 @@ import (
 	"../helper"
 	"../common"
 	"C"
+	"fmt"
 )
 
 type TreeData struct{
@@ -102,14 +103,17 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 		}else{
 			unShowSubItems(current)
 		}
-		changeBgColor(e)
 	})
 
+	btn.SetCanFocus(true)
+
 	btn.Connect("enter_notify_event", func(e *gtk.EventBox) {
+		fmt.Println("focus_in_event")
 		changeBgColor(e)
 	})
 
 	btn.Connect("leave_notify_event", func(e *gtk.EventBox) {
+		fmt.Println("focus_out_event")
 		clearBgColor(e)
 	})
 

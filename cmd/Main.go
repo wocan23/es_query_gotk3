@@ -36,9 +36,11 @@ func Layout() *gtk.Box{
 
 	subBox.SetMarginTop(10)
 	subBox.SetVExpand(true)
+	subBox.SetMarginBottom(0)
 
 	box.Add(subBox)
 	box.SetVExpand(true)
+	box.SetMarginBottom(0)
 	box.ShowAll()
 	return box
 }
