@@ -83,7 +83,17 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 
 
 	textV,_ := gtk.LabelNew(text)
-	textV.SetTooltipText(text)
+
+	//var fixed *gtk.Fixed
+
+	//textV.Connect("enter_notify_event", func(v gtk.Label) {
+	//	fixed,_ = gtk.FixedNew()
+	//	t,_ := gtk.LabelNew(text)
+	//	fixed.Add(t)
+	//})
+	//textV.Connect("leave_notify_event", func(v gtk.Label) {
+	//
+	//})
 
 
 	entity,_ := gtk.EntryNew()

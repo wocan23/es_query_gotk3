@@ -2,6 +2,7 @@ package component
 
 import (
 	"../common"
+	//"../helper"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -24,6 +25,9 @@ func CreateHeader() *gtk.Box{
 	menu.Add(editBtn)
 	menu.Add(addBtn)
 	menu.Add(searchBtn)
+
+	//helper.ChangeBgColor(menu,"#ff00f0")
+	//helper.ChangeBgColor(box,"#00ff00")
 
 	box.Add(menu)
 	box.ShowAll()
