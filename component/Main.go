@@ -10,27 +10,17 @@ import (
 func CreateMain()*gtk.Box{
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 
-	//box.SetSizeRequest(common.WindowWidth-common.WindowLeftWidth,common.WindowLeftHeight)
-
-	box.SetBorderWidth(2)
-
 	box.Add(CreateMainDetail())
 
-	box.SetVExpand(true)
 	box.ShowAll()
 	return box
 }
 
 func CreateMainDetail() *gtk.Box{
 	mainBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
-	//width,_ := mainBox.GetSizeRequest()
-
 
 	// 输入区域
 	text,_ := gtk.TextViewNew()
-	text.SetVExpand(true)
-
-	//text.SetSizeRequest(-1,common.ShowHeight)
 
 	// 展示区域
 	showBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
@@ -50,7 +40,6 @@ func CreateMainDetail() *gtk.Box{
 
 	mainBox.Add(text)
 	mainBox.Add(showBox)
-	mainBox.SetVExpand(true)
 
 	return mainBox
 }

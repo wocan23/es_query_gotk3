@@ -26,8 +26,6 @@ func CreateHeader() *gtk.Box{
 	menu.Add(searchBtn)
 
 	box.Add(menu)
-	box.SetMarginStart(20)
-	box.SetMarginTop(20)
 	box.ShowAll()
 	return box
 }

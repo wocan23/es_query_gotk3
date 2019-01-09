@@ -15,7 +15,11 @@ func mainFunc()  {
 	win := helper.CreateWindow(common.WindowTitle,common.WindowWidth,common.WindowHeight)
 	win.SetVAlign(gtk.ALIGN_CENTER)
 	win.SetPosition(gtk.WIN_POS_CENTER)
-	win.Add(Layout())
+
+	layout := Layout()
+	layout.SetMarginTop(20)
+	layout.SetMarginStart(20)
+	win.Add(layout)
 	win.SetVExpand(true)
 	win.Show()
 	gtk.Main()
