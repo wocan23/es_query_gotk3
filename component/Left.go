@@ -2,7 +2,6 @@ package component
 
 import (
 	"../common"
-	"../helper"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -27,7 +26,7 @@ func CreateLeftDetail()*gtk.Box{
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,5)
 
 
-	helper.ChangeBgColor(box,"#34f901")
+	//helper.ChangeBgColor(box,"#34f901")
 
 	//cssProvider,_ := gtk.CssProviderNew()
 	//cssProvider.LoadFromData(`.left{

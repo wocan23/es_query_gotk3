@@ -1,11 +1,12 @@
 package main
 
 import (
-	"../helper"
-	"../common"
 	"../component"
 	"github.com/gotk3/gotk3/gtk"
-	"fmt"
+	"log"
+	"os"
+	"github.com/gotk3/gotk3/glib"
+	"../common"
 )
 
 func main(){
@@ -13,36 +14,32 @@ func main(){
 }
 
 func mainFunc()  {
-	win := helper.CreateWindow(common.WindowTitle,common.WindowWidth,common.WindowHeight)
-	win.SetVAlign(gtk.ALIGN_CENTER)
-	win.SetPosition(gtk.WIN_POS_CENTER)
+	// Create Gtk Application, change appID to your application domain name reversed.
+	const appID = "org.gtk.es"
+	application, err := gtk.ApplicationNew(appID, glib.APPLICATION_FLAGS_NONE)
+	// Check to make sure no errors when creating Gtk Application
+	if err != nil {
+		log.Fatal("Could not create application.", err)
+	}
+	application.Connect("activate", func() { onActivate(application) })
+	os.Exit(application.Run(os.Args))
+}
 
-	box,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
-
-	layout := Layout(win)
-	layout.SetMarginTop(20)
-	layout.SetMarginStart(20)
-	//layout.SetMarginBottom(20)
-	//layout.SetMarginEnd(20)
-	layout.SetVExpand(true)
-
-	box.Add(layout)
-
-	box.ShowAll()
-
-	win.Add(box)
-
-	win.Connect("configure_event", func(widget *gtk.Window) {
-		w1,h1 := win.GetSize()
-		box.SetSizeRequest(w1,h1)
-	})
-
-	win.Show()
-	gtk.Main()
+func onActivate(application *gtk.Application) {
+	// Create ApplicationWindow
+	appWindow, err := gtk.ApplicationWindowNew(application)
+	if err != nil {
+		log.Fatal("Could not create application window.", err)
+	}
+	// Set ApplicationWindow Properties
+	appWindow.SetTitle("Basic Application.")
+	appWindow.SetDefaultSize(common.WindowWidth, common.WindowHeight)
+	appWindow.Add(Layout())
+	appWindow.Show()
 }
 
 
-func Layout(win *gtk.Window) *gtk.Box{
+func Layout() *gtk.Box{
 
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 	// heaer
@@ -63,22 +60,10 @@ func Layout(win *gtk.Window) *gtk.Box{
 
 	box.Add(hbox)
 	box.SetVExpand(true)
-	//box.SetMarginBottom(10)
-	//box.SetMarginTop(10)
-	//box.SetMarginStart(10)
+	box.SetMarginBottom(10)
+	box.SetMarginTop(10)
+	box.SetMarginStart(10)
 	box.ShowAll()
-
-
-	//win.Connect("configure_event", func(win *gtk.Window) {
-	//
-	//	_,h := win.GetSize()
-	//	//_,height := subBox.GetSizeRequest()
-	//	width,_ := left.GetSizeRequest()
-	//	fmt.Println(h)
-	//	//fmt.Println(height)
-	//	sub := common.WindowHeight -22
-	//	left.SetSizeRequest(width,sub)
-	//})
 
 
 	return box
