@@ -73,7 +73,7 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 	var level = checkLevel(data)
 	for i := 0; i < level; i++{
 		_,height := box.GetSizeRequest()
-		label,_ := gtk.LabelNew(">")
+		label,_ := gtk.LabelNew(" ")
 		label.SetSizeRequest(10,height)
 		box.Add(label)
 	}
@@ -93,6 +93,7 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 	box.Add(image)
 	box.Add(textV)
 
+
 	// 点击事件
 	btn.Connect("button_press_event", func(e *gtk.EventBox) {
 		data.isSubShow = !data.isSubShow
@@ -101,25 +102,40 @@ func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
 		}else{
 			unShowSubItems(current)
 		}
-		// 染色
-		cssProvider,_ := gtk.CssProviderNew()
-		cssProvider.LoadFromData(`.clicked{
-			background-color:blue;
-		}`)
-
-		/**
-		Using CSS (like a .mybutton { background-color: red; }) and loading these styles in as a global style, then getting the style context for your widget and calling btnStyleContext.AddClass("mybutton").
-		 */
-		screen,_ := btn.GetScreen()
-		style,_ := btn.GetStyleContext()
-		gtk.AddProviderForScreen(screen,cssProvider,1)
-
-		style.AddClass("clicked")
+		changeBgColor(e)
 	})
+
+	btn.Connect("enter_notify_event", func(e *gtk.EventBox) {
+		changeBgColor(e)
+	})
+
+	btn.Connect("leave_notify_event", func(e *gtk.EventBox) {
+		clearBgColor(e)
+	})
+
 	btn.Add(box)
 	btn.ShowAll()
 
 	return btn
+}
+
+func changeBgColor(btn *gtk.EventBox){
+	// 染色
+	cssProvider,_ := gtk.CssProviderNew()
+	cssProvider.LoadFromData(`.clicked{
+			background-color:#87CEFA;
+		}`)
+	screen,_ := btn.GetScreen()
+	style,_ := btn.GetStyleContext()
+	gtk.AddProviderForScreen(screen,cssProvider,1)
+
+	style.AddClass("clicked")
+}
+
+func clearBgColor(btn *gtk.EventBox){
+	style,_ := btn.GetStyleContext()
+
+	style.RemoveClass("clicked")
 }
 
 func showSubItems(data *TreeData,root *gtk.Box,current *gtk.Box){
