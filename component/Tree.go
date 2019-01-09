@@ -45,7 +45,7 @@ func CreateTreeData()*TreeData{
 func CreateTreeByData(data *TreeData,getWidget func(data *TreeData,root *gtk.Box,parent *gtk.Box)gtk.IWidget) *gtk.Box {
 	box, _ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
 	box.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
-	box.SetBorderWidth(5)
+	box.SetBorderWidth(0)
 	flushTree(box,data,box,getWidget)
 	return box
 

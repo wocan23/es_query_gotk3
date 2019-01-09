@@ -22,4 +22,7 @@ const (
 	TreeItemWidth = 25
 	TreeItemHeight = 25
 
+	ShowHeight = 150
+	ShowBarSpace = 10
+
 )
