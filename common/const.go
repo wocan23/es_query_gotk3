@@ -25,4 +25,16 @@ const (
 	ShowHeight = 150
 	ShowBarSpace = 10
 
+	LayoutMarginTop = 10
+	LayoutMarginBottom = 10
+	LayoutMarginLeft = 10
+	LayoutMarginRight = 10
+
+	LeftScrollInital = 0
+	LeftScrollLower = 0
+	LeftScrollUpper = 1
+	LeftScrollStepIncrement = 10
+	LeftScrollPageIncrement = 10
+	LeftScrollPageSize = 10
+
 )

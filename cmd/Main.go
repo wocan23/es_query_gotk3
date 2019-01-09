@@ -53,16 +53,16 @@ func Layout() *gtk.Box{
 	// main
 	subBox.Add(component.CreateMain())
 
-	subBox.SetMarginTop(10)
+	subBox.SetMarginTop(common.LayoutMarginTop)
 	subBox.SetVExpand(true)
-	subBox.SetMarginBottom(10)
+	subBox.SetMarginBottom(common.LayoutMarginBottom)
 	hbox.Add(subBox)
 
 	box.Add(hbox)
 	box.SetVExpand(true)
-	box.SetMarginBottom(10)
-	box.SetMarginTop(10)
-	box.SetMarginStart(10)
+	box.SetMarginBottom(common.LayoutMarginBottom)
+	box.SetMarginTop(common.LayoutMarginTop)
+	box.SetMarginStart(common.LayoutMarginLeft)
 	box.ShowAll()
 
 
