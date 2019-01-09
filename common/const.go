@@ -7,7 +7,7 @@ const (
 	WindowHeight = 500
 
 	WindowLeftWidth = 200
-	WindowLeftHeight = 500
+	WindowLeftHeight = 400
 
 	SubWindowWidth = 400
 	SubWindowHeight = 600
@@ -36,5 +36,8 @@ const (
 	LeftScrollStepIncrement = 10
 	LeftScrollPageIncrement = 10
 	LeftScrollPageSize = 10
+
+	MainInputWidth = 600
+	MainInputHeight = 80
 
 )
