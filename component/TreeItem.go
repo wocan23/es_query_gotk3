@@ -64,21 +64,21 @@ func CreateTree() *gtk.Box{
 	selection.Connect("changed", treeSelectionChangedCB)
 
 	// treeview
-	treeView.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
+	//treeView.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
 	treeView.SetMarginTop(5)
 	treeView.SetEnableSearch(true)
 	treeView.SetSearchColumn(0)
 	treeView.SetHAlign(gtk.ALIGN_START)
 
 	searchEntity,_ := gtk.EntryNew()
-	searchEntity.SetSizeRequest(common.WindowLeftWidth,300)
+	//searchEntity.SetSizeRequest(common.WindowLeftWidth,300)
 	searchEntity.SetText("dfsdf")
 	searchEntity.SetEditable(true)
 	treeView.SetSearchEntry(searchEntity)
 	treeView.ShowAll()
 
 	vBox.Add(treeView)
-	vBox.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
+	//vBox.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
 	return vBox
 }
 

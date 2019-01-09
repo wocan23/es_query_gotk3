@@ -16,6 +16,7 @@ func mainFunc()  {
 	win.SetVAlign(gtk.ALIGN_CENTER)
 	win.SetPosition(gtk.WIN_POS_CENTER)
 	win.Add(Layout())
+	win.SetVExpand(true)
 	win.Show()
 	gtk.Main()
 }
@@ -34,8 +35,10 @@ func Layout() *gtk.Box{
 	subBox.Add(component.CreateMain())
 
 	subBox.SetMarginTop(10)
+	subBox.SetVExpand(true)
 
 	box.Add(subBox)
+	box.SetVExpand(true)
 	box.ShowAll()
 	return box
 }

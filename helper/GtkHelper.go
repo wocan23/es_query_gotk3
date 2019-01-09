@@ -19,6 +19,7 @@ func CreateWindow(title string,width int,height int) *gtk.Window{
 	})
 
 	win.SetDefaultSize(width, height)
+	win.SetVExpand(true)
 	win.SetTitle(title)
 
 	win.ShowAll()
