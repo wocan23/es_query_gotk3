@@ -4,7 +4,7 @@ const (
 	WindowTitle = "ElasticSearch Query"
 
 	WindowWidth = 1000
-	WindowHeight = 600
+	WindowHeight = 500
 
 	WindowLeftWidth = 200
 	WindowLeftHeight = 500

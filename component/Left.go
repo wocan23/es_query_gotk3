@@ -1,13 +1,14 @@
 package component
 
 import (
-	//"../common"
+	"../common"
 	"github.com/gotk3/gotk3/gtk"
 )
 
 
 func CreateLeft()*gtk.Box{
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+	box.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
 
 	box.Add(CreateLeftDetail())
 
@@ -18,7 +19,7 @@ func CreateLeftDetail()*gtk.Box{
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
 
 
-	//box.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
+
 	//cssProvider,_ := gtk.CssProviderNew()
 	//cssProvider.LoadFromData(`.left{
 	//		width:200;
