@@ -41,26 +41,24 @@ func CreateHeader() *gtk.Box{
 
 func connClickCallback(btn *gtk.Button){
 	fmt.Println("click conn")
+	common.GlobalWin.SetKeepBelow(true)
 
-	//connWin,_ :=  gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
-	//connWin.SetKeepAbove(true)
-	//connWin.SetPosition(gtk.WIN_POS_CENTER)
-	//connWin.SetDestroyWithParent(true)
-	//connWin.SetVisible(true)
-	//connWin.Show()
+	connWin,_ :=  gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
+	connWin.SetKeepAbove(true)
+	connWin.SetFocusVisible(true)
+	connWin.SetPosition(gtk.WIN_POS_CENTER)
+	connWin.SetTitle("新建连接")
+	connWin.SetSizeRequest(common.ConnWindowWidth,common.ConnWindowHeight)
 
-	//dialog,_ := gtk.DialogNew()
-
-	//common.GlobalWin.SetKeepAbove(true)
-	//dialog.SetKeepAbove(true)
-	//dialog.SetPosition(gtk.WIN_POS_CENTER)
-	//dialog.SetSizeRequest(200,200)
-	//dialog.SetTitle("新建连接")
-	//dialog.SetVisible(true)
-	//win,_ := btn.GetWindow()
-	//dialog.SetSensitive(true)
-	//dialog.SetParentWindow(win)
-	//dialog.Show()
+	label,_ := gtk.LabelNew("dfsdf")
+	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+	box.Add(label)
+	connWin.Add(box)
+	//
+	connWin.ShowAll()
+	connWin.Connect("destroy", func() {
+		common.GlobalWin.SetKeepBelow(false)
+	})
 
 }
 

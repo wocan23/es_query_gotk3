@@ -42,4 +42,7 @@ const (
 
 	BarImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png"
 
+	ConnWindowWidth = 500
+	ConnWindowHeight = 600
+
 )

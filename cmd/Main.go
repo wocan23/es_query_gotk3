@@ -7,6 +7,7 @@ import (
 	"os"
 	"github.com/gotk3/gotk3/glib"
 	"../common"
+	"github.com/gotk3/gotk3/gdk"
 )
 
 func main(){
@@ -22,7 +23,7 @@ func mainFunc()  {
 		log.Fatal("Could not create application.", err)
 	}
 	application.Connect("activate", func() { onActivate(application) })
-	os.Exit(application.Run(nil))
+	os.Exit(application.Run(os.Args))
 }
 
 func onActivate(application *gtk.Application) {
@@ -36,7 +37,9 @@ func onActivate(application *gtk.Application) {
 	appWindow.SetDefaultSize(common.WindowWidth, common.WindowHeight)
 	appWindow.Add(Layout())
 	common.GlobalWin = appWindow
-	appWindow.SetKeepAbove(false)
+	appWindow.SetPosition(gtk.WIN_POS_CENTER)
+	//appWindow.SetKeepBelow(true)
+	appWindow.SetTypeHint(gdk.WINDOW_TYPE_HINT_DIALOG)
 	appWindow.Show()
 }
 
