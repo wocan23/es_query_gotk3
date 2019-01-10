@@ -75,35 +75,29 @@ func (tab *Tab)flushBar(scroll *gtk.ScrolledWindow,curBox *gtk.Box){
 	scroll.Add(box)
 }
 
-func (tab *Tab)bindEvent(box *gtk.Box,curBox *gtk.Box,k string){
+func (tab *Tab)bindEvent(barBox *gtk.Box,curBox *gtk.Box,k string){
 	bar,eventBox,imageBox := CreateTabItem(common.BarImagePath,k)
 
-	box.Add(bar)
-	var k1 = k
-	var bar1 = bar
-	var box1 = box
+	barBox.Add(bar)
 	eventBox.Connect("button_press_event", func(box *gtk.EventBox) {
-		fmt.Println(k1)
 		curBox.GetChildren().Foreach(func(item interface{}) {
 			ie := item.(*gtk.Widget)
 			curBox.Remove(ie)
 		})
-		helper.ChangeBgColor(k,tab.tabBoxMap[k1],colors[i%3])
-		i++
-		curBox.Add(tab.tabBoxMap[k1])
+		curBox.Add(tab.tabBoxMap[k])
 		curBox.ShowAll()
 	})
 	imageBox.AddEvents(int(gdk.EVENT_BUTTON_PRESS))
 	imageBox.Connect("button_press_event", func(box *gtk.EventBox) {
-		tab.tabBoxMap[k1].Destroy()
+		tab.tabBoxMap[k].Destroy()
 		delete(tab.tabBoxMap, k)
-		box1.Remove(bar1)
+		barBox.Remove(bar)
 
 		curBox.GetChildren().Foreach(func(item interface{}) {
 			ie := item.(*gtk.Widget)
 			curBox.Remove(ie)
 		})
-		var keyIndex = common2.IndexOfStrArr(tab.tabBoxs,k1)
+		var keyIndex = common2.IndexOfStrArr(tab.tabBoxs,k)
 		tab.tabBoxs = common2.RemoveStrArr(tab.tabBoxs,keyIndex)
 		tabBoxLength := len(tab.tabBoxs)
 		if tabBoxLength > 0 {
@@ -115,8 +109,8 @@ func (tab *Tab)bindEvent(box *gtk.Box,curBox *gtk.Box,k string){
 			curBox.Add(tab.tabBoxMap[newKey])
 		}
 
+		barBox.ShowAll()
 		curBox.ShowAll()
-		box1.ShowAll()
 	})
 }
 
