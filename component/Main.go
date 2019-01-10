@@ -22,19 +22,17 @@ func CreateMainDetail() *gtk.Box{
 	mainBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 
 	// tab页
-	tab := Tab{}
-
 
 
 	//helper.ChangeBgColor(mainBox,"#676767")
+	tab,tabBox := CreateTabBox()
 
+	mainBox.Add(tabBox)
 
+	AddTab(tab,"aaa",TabPage("aaa"))
+	AddTab(tab,"bbb",TabPage("bbb"))
+	AddTab(tab,"ccc",TabPage("ccc"))
 
-	tab.AddTab("aaa",TabPage("aaa"))
-	tab.AddTab("bbb",TabPage("bbb"))
-	tab.AddTab("ccc",TabPage("ccc"))
-
-	mainBox.Add(tab.ToTabBox())
 
 	return mainBox
 }

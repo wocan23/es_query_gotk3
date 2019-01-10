@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gotk3/gotk3/gdk"
 	common2 "github.com/itgeniusshuai/go_common/common"
+	"sync"
 )
 
 func CreateTabItem(imagePath string,text string) (*gtk.Box,*gtk.EventBox,*gtk.EventBox){
@@ -39,10 +40,17 @@ type Tab struct{
 	tabBoxMap map[string]*gtk.Box
 	tabBoxs []string
 	curBox *gtk.Box
+	barBox *gtk.Box
+}
+
+func CreateTabBox()(*Tab,*gtk.Box){
+	tab := new(Tab)
+	tabBox := tab.toTabBox()
+	return tab,tabBox
 }
 
 
-func (tab *Tab)ToTabBox() *gtk.Box{
+func (tab *Tab)toTabBox() *gtk.Box{
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 
 	// tab条
@@ -51,6 +59,7 @@ func (tab *Tab)ToTabBox() *gtk.Box{
 	scroll,_ := gtk.ScrolledWindowNew(adjust,nil)
 
 	var curBox,_ = gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+	tab.curBox = curBox
 	tab.flushBar(scroll,curBox)
 	// 展示区域
 	box.Add(scroll)
@@ -65,27 +74,31 @@ var colors = []string{"00f","f00","#0f0"}
 
 
 func (tab *Tab)flushBar(scroll *gtk.ScrolledWindow,curBox *gtk.Box){
-	box,_ :=  gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+	barBox,_ :=  gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
 	keys := Keys(tab.tabBoxMap)
 	//var lastKey string
-	curBox.Add(tab.curBox)
 	for _,k:= range keys{
-		tab.bindEvent(box,curBox,k)
+		tab.AddTabAndBind(barBox,curBox,k)
 	}
-	scroll.Add(box)
+	scroll.Add(barBox)
+	tab.barBox = barBox
 }
 
-func (tab *Tab)bindEvent(barBox *gtk.Box,curBox *gtk.Box,k string){
+func removeAndAddNew(curBox *gtk.Box,newBox *gtk.Box){
+	curBox.GetChildren().Foreach(func(item interface{}) {
+		ie := item.(*gtk.Widget)
+		curBox.Remove(ie)
+	})
+	curBox.Add(newBox)
+	curBox.ShowAll()
+}
+
+func (tab *Tab)AddTabAndBind(barBox *gtk.Box,curBox *gtk.Box,k string){
 	bar,eventBox,imageBox := CreateTabItem(common.BarImagePath,k)
 
 	barBox.Add(bar)
 	eventBox.Connect("button_press_event", func(box *gtk.EventBox) {
-		curBox.GetChildren().Foreach(func(item interface{}) {
-			ie := item.(*gtk.Widget)
-			curBox.Remove(ie)
-		})
-		curBox.Add(tab.tabBoxMap[k])
-		curBox.ShowAll()
+		removeAndAddNew(curBox,tab.tabBoxMap[k])
 	})
 	imageBox.AddEvents(int(gdk.EVENT_BUTTON_PRESS))
 	imageBox.Connect("button_press_event", func(box *gtk.EventBox) {
@@ -93,10 +106,8 @@ func (tab *Tab)bindEvent(barBox *gtk.Box,curBox *gtk.Box,k string){
 		delete(tab.tabBoxMap, k)
 		barBox.Remove(bar)
 
-		curBox.GetChildren().Foreach(func(item interface{}) {
-			ie := item.(*gtk.Widget)
-			curBox.Remove(ie)
-		})
+
+		var newCurBox *gtk.Box
 		var keyIndex = common2.IndexOfStrArr(tab.tabBoxs,k)
 		tab.tabBoxs = common2.RemoveStrArr(tab.tabBoxs,keyIndex)
 		tabBoxLength := len(tab.tabBoxs)
@@ -106,18 +117,25 @@ func (tab *Tab)bindEvent(barBox *gtk.Box,curBox *gtk.Box,k string){
 			}
 			newKey := tab.tabBoxs[keyIndex]
 
-			curBox.Add(tab.tabBoxMap[newKey])
+			newCurBox  = tab.tabBoxMap[newKey]
 		}
+		removeAndAddNew(curBox,newCurBox)
 
 		barBox.ShowAll()
 		curBox.ShowAll()
 	})
+	removeAndAddNew(curBox,tab.tabBoxMap[k])
+	barBox.ShowAll()
+	curBox.ShowAll()
 }
 
-func (tab *Tab)AddTab(text string, box *gtk.Box){
+var lock sync.Mutex
+
+func AddTab(tab *Tab,text string, box *gtk.Box){
+	defer lock.Unlock()
+	lock.Lock()
 	if tab.tabBoxMap == nil{
 		tab.tabBoxMap = make(map[string]*gtk.Box,0)
-		tab.curBox = box
 		fmt.Println("nil")
 	}
 	tab.tabBoxMap[text] = box
@@ -125,6 +143,7 @@ func (tab *Tab)AddTab(text string, box *gtk.Box){
 		tab.tabBoxs = make([]string,0)
 	}
 	tab.tabBoxs = append(tab.tabBoxs, text)
+	tab.AddTabAndBind(tab.barBox,tab.curBox,text)
 }
 
 func Keys(kv map[string]*gtk.Box)[]string{
