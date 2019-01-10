@@ -19,37 +19,54 @@ func CreateMain()*gtk.Box{
 }
 
 func CreateMainDetail() *gtk.Box{
+	mainBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 
 	// tab页
-	
+	tab := Tab{}
 
-	mainBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+
+
 	//helper.ChangeBgColor(mainBox,"#676767")
 
+
+
+	tab.AddTab("aaa",TabPage("aaa"))
+	tab.AddTab("bbb",TabPage("bbb"))
+	tab.AddTab("ccc",TabPage("ccc"))
+
+	mainBox.Add(tab.ToTabBox())
+
+	return mainBox
+}
+
+func TabPage(txt string) *gtk.Box{
+	tabBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 	// 输入区域
-	text,_ := gtk.TextViewNew()
+	text,_ := gtk.LabelNew(txt)
 	text.SetSizeRequest(common.WindowWidth-common.WindowLeftWidth,common.MainInputHeight)
+	text.SetTooltipText(txt)
 
 	// 展示区域
 	adjust,_ := gtk.AdjustmentNew(common.LeftScrollInital,common.LeftScrollLower,common.LeftScrollUpper,common.LeftScrollStepIncrement,common.LeftScrollPageIncrement,common.LeftScrollPageSize)
 
-	showWindow,_ := gtk.ScrolledWindowNew(nil,adjust)
+	// show box包含scroll和工具条+—
 	showBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+	showWindow,_ := gtk.ScrolledWindowNew(nil,adjust)
 	// 列表
+	dataBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+	showWindow.Add(dataBox)
 
-
-	showWindow.Add(showBox)
 	// 工具条
 	bar,_ :=  gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,common.ShowBarSpace)
 
-	btn,_ := gtk.ButtonNewWithLabel("查询")
+	btn,_ := gtk.ButtonNewWithLabel(txt)
 	bar.Add(btn)
 
 
+	showBox.Add(showWindow)
 	showBox.Add(bar)
 
-	mainBox.Add(text)
-	mainBox.Add(showWindow)
-
-	return mainBox
+	tabBox.Add(text)
+	tabBox.Add(showBox)
+	return tabBox
 }

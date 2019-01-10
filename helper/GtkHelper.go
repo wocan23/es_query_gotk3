@@ -4,6 +4,7 @@ import (
 	"log"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/gotk3/gotk3/gdk"
+	"fmt"
 )
 
 func CreateWindow(title string,width int,height int) *gtk.Window{
@@ -39,14 +40,15 @@ func SetSize(widget gtk.IWidget,width int, height int){
 	widget.Set("height",height)
 }
 
-func ChangeBgColor(widget *gtk.Box,rgb string){
+func ChangeBgColor(id string,widget *gtk.Box,rgb string){
+	fmt.Println(widget)
 		// 染色
 		cssProvider,_ := gtk.CssProviderNew()
-		cssProvider.LoadFromData(".box{ background-color:"+rgb+";}")
+		cssProvider.LoadFromData("."+id+"{ background-color:"+rgb+";}")
 		screen,_ := widget.GetScreen()
 		style,_ := widget.GetStyleContext()
 		gtk.AddProviderForScreen(screen,cssProvider,1)
 
-		style.AddClass("box")
+		style.AddClass(id)
 }
 

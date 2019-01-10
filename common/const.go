@@ -40,4 +40,6 @@ const (
 	MainInputWidth = 600
 	MainInputHeight = 80
 
+	BarImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png"
+
 )
