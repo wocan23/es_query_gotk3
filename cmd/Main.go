@@ -22,7 +22,7 @@ func mainFunc()  {
 		log.Fatal("Could not create application.", err)
 	}
 	application.Connect("activate", func() { onActivate(application) })
-	os.Exit(application.Run(os.Args))
+	os.Exit(application.Run(nil))
 }
 
 func onActivate(application *gtk.Application) {
@@ -35,6 +35,8 @@ func onActivate(application *gtk.Application) {
 	appWindow.SetTitle("Basic Application.")
 	appWindow.SetDefaultSize(common.WindowWidth, common.WindowHeight)
 	appWindow.Add(Layout())
+	common.GlobalWin = appWindow
+	appWindow.SetKeepAbove(false)
 	appWindow.Show()
 }
 

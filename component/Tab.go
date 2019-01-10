@@ -4,7 +4,6 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	"../helper"
 	"../common"
-	"fmt"
 	"github.com/gotk3/gotk3/gdk"
 	common2 "github.com/itgeniusshuai/go_common/common"
 	"sync"
@@ -128,7 +127,6 @@ func AddTab(tab *Tab,text string, box *gtk.Box){
 	lock.Lock()
 	if tab.tabBoxMap == nil{
 		tab.tabBoxMap = make(map[string]*gtk.Box,0)
-		fmt.Println("nil")
 	}
 	tab.tabBoxMap[text] = box
 	if tab.tabBoxs == nil{
