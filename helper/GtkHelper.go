@@ -52,3 +52,12 @@ func ChangeBgColor(id string,widget *gtk.Box,rgb string){
 		style.AddClass(id)
 }
 
+func RemoveAndAddNew(curBox *gtk.Box,newBox *gtk.Box){
+	curBox.GetChildren().Foreach(func(item interface{}) {
+		ie := item.(*gtk.Widget)
+		curBox.Remove(ie)
+	})
+	curBox.Add(newBox)
+	curBox.ShowAll()
+}
+

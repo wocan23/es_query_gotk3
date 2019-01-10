@@ -76,7 +76,6 @@ var colors = []string{"00f","f00","#0f0"}
 func (tab *Tab)flushBar(scroll *gtk.ScrolledWindow,curBox *gtk.Box){
 	barBox,_ :=  gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
 	keys := Keys(tab.tabBoxMap)
-	//var lastKey string
 	for _,k:= range keys{
 		tab.AddTabAndBind(barBox,curBox,k)
 	}
@@ -84,21 +83,14 @@ func (tab *Tab)flushBar(scroll *gtk.ScrolledWindow,curBox *gtk.Box){
 	tab.barBox = barBox
 }
 
-func removeAndAddNew(curBox *gtk.Box,newBox *gtk.Box){
-	curBox.GetChildren().Foreach(func(item interface{}) {
-		ie := item.(*gtk.Widget)
-		curBox.Remove(ie)
-	})
-	curBox.Add(newBox)
-	curBox.ShowAll()
-}
+
 
 func (tab *Tab)AddTabAndBind(barBox *gtk.Box,curBox *gtk.Box,k string){
 	bar,eventBox,imageBox := CreateTabItem(common.BarImagePath,k)
 
 	barBox.Add(bar)
 	eventBox.Connect("button_press_event", func(box *gtk.EventBox) {
-		removeAndAddNew(curBox,tab.tabBoxMap[k])
+		helper.RemoveAndAddNew(curBox,tab.tabBoxMap[k])
 	})
 	imageBox.AddEvents(int(gdk.EVENT_BUTTON_PRESS))
 	imageBox.Connect("button_press_event", func(box *gtk.EventBox) {
@@ -119,12 +111,12 @@ func (tab *Tab)AddTabAndBind(barBox *gtk.Box,curBox *gtk.Box,k string){
 
 			newCurBox  = tab.tabBoxMap[newKey]
 		}
-		removeAndAddNew(curBox,newCurBox)
+		helper.RemoveAndAddNew(curBox,newCurBox)
 
 		barBox.ShowAll()
 		curBox.ShowAll()
 	})
-	removeAndAddNew(curBox,tab.tabBoxMap[k])
+	helper.RemoveAndAddNew(curBox,tab.tabBoxMap[k])
 	barBox.ShowAll()
 	curBox.ShowAll()
 }
