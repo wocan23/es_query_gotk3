@@ -12,6 +12,8 @@ type TreeData struct{
 	subItems []*TreeData //子数据
 	isSubShow bool // 是否展示子标签
 	isRoot bool
+	treeBox *gtk.Box // 当前对应的最外层box
+	rootBox *gtk.Box
 
 	parent *TreeData
 }
@@ -36,6 +38,37 @@ func (treeData *TreeData)AddSubItems(subTreeData *TreeData){
 	}
 	treeData.subItems = append(treeData.subItems, subTreeData)
 	subTreeData.parent = treeData
+	subTreeData.rootBox = treeData.rootBox
+
+	if treeData.isRoot{
+		flushTree(treeData.rootBox,subTreeData,treeData.treeBox,GetWidget)
+	}
+
+
+}
+
+func (treeData *TreeData)AddSubItemAndShow(subTreeData *TreeData){
+	treeData.AddSubItems(subTreeData)
+	// 直接展示
+	subTreeData.treeBox =
+	flushTree(treeData.rootBox,subTreeData,treeData.treeBox,GetWidget)
+}
+
+func (treeData *TreeData)GetRoot() *TreeData{
+	var parent *TreeData
+	for treeData.parent != nil{
+		parent = treeData.parent
+	}
+	return parent
+}
+
+func CreateTreeRoot()(*TreeData,*gtk.Box){
+	treeData := new(TreeData)
+	treeData.isRoot = true
+	treeBox := CreateTreeByData(treeData,GetWidget)
+	treeData.rootBox = treeBox
+	treeData.treeBox = treeBox
+	return treeData,treeBox
 }
 
 func CreateTreeData()*TreeData{
@@ -51,14 +84,18 @@ func CreateTreeByData(data *TreeData,getWidget func(data *TreeData,root *gtk.Box
 
 }
 
-func flushTree(root *gtk.Box,data *TreeData,parent *gtk.Box,getWidget func(data *TreeData,root *gtk.Box,parent *gtk.Box)gtk.IWidget) {
+func flushTree(root *gtk.Box,data *TreeData,parent *gtk.Box,getWidget func(data *TreeData,root *gtk.Box,parent *gtk.Box)gtk.IWidget) *gtk.Box{
 	// 第一层直接遍历子
 	curBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 
-	widget := getWidget(data,root,curBox)
-	curBox.Add(widget)
+	if !data.isRoot{
+		widget := getWidget(data,root,curBox)
+		curBox.Add(widget)
+	}
 
 	parent.Add(curBox)
+
+	return curBox
 }
 
 func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
@@ -188,12 +225,13 @@ func checkLevel(data *TreeData)int{
 func TreeTest()*gtk.Box{
 
 	// 数据
-	d1 := CreateTreeData()
+	d1,box := CreateTreeRoot()
 
 	d11 := CreateTreeData()
 	d12 := CreateTreeData()
 	d13 := CreateTreeData()
 	d111 := CreateTreeData()
+
 
 	d121 := CreateTreeData()
 	d122 := CreateTreeData()
@@ -222,6 +260,11 @@ func TreeTest()*gtk.Box{
 	d132.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
 	d133.SetProperty("text","d133")
 	d133.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+
+	d1.AddSubItems(d11)
+	d1.AddSubItems(d12)
+	d1.AddSubItems(d13)
+
 
 	d11.AddSubItems(d111)
 
@@ -285,11 +328,7 @@ func TreeTest()*gtk.Box{
 	d13.AddSubItems(d133)
 	d13.AddSubItems(d133)
 
-	d1.AddSubItems(d11)
-	d1.AddSubItems(d12)
-	d1.AddSubItems(d13)
-	d1.isRoot = true
 
-	return CreateTreeByData(d1,GetWidget)
+	return box
 
 }
