@@ -35,7 +35,10 @@ func onActivate(application *gtk.Application) {
 	// Set ApplicationWindow Properties
 	appWindow.SetTitle("Basic Application.")
 	appWindow.SetDefaultSize(common.WindowWidth, common.WindowHeight)
-	appWindow.Add(Layout())
+
+	//todo
+	appWindow.Add(component.Tree2Test())
+	//appWindow.Add(Layout())
 	common.GlobalWin = appWindow
 	appWindow.SetPosition(gtk.WIN_POS_CENTER)
 	//appWindow.SetKeepBelow(true)
@@ -73,6 +76,8 @@ func Layout() *gtk.Box{
 
 	return box
 }
+
+
 
 
 
