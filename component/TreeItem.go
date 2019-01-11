@@ -14,7 +14,7 @@ const (
 )
 
 
-func CreateTree() *gtk.Box{
+func CreateTree1() *gtk.Box{
 	vBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 	//gtk.ScrollbarNew(gtk.ORIENTATION_VERTICAL,nil)
 	treeView, err := gtk.TreeViewNew()
