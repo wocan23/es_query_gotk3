@@ -5,6 +5,7 @@ import (
 	"C"
 	"../helper"
 	"../common"
+	"github.com/gotk3/gotk3/gdk"
 )
 /**
  nodeBox为当前节点最外层box
@@ -210,12 +211,36 @@ func (node *Node)CreateNodeDataBox(label string,icon string)(*gtk.Box){
 	nodeBox.Add(eventBox)
 
 
-	eventBox.Connect("button_press_event", func(box *gtk.EventBox) {
-		if node.isSubShow{
-			node.UnShowSub()
-		}else{
-			node.ShowSub()
+	eventBox.Connect("button_press_event", func(box *gtk.EventBox ,event *gdk.Event) {
+
+		eventButton := gdk.EventButtonNewFromEvent(event)
+
+		/**
+			1:左键
+			2:滚轮
+			3:右键
+		 */
+		switch eventButton.Button() {
+		case 3:
+			// 打开窗口
+			rightWindow,_ := gtk.WindowNew(gtk.WINDOW_POPUP)
+			// 获取鼠标位置
+			x := eventButton.X()
+			y := eventButton.Y()
+			rightWindow.SetMarginStart(int(x))
+			rightWindow.SetMarginTop(int(y))
+			rightWindow.SetSizeRequest(common.RightKeyWindowWidth,common.RightKeyWindowHeight)
+			rightWindow.SetResizable(false)
+			rightWindow.ShowAll()
+		case 1:
+			// 左键展开/关闭
+			if node.isSubShow{
+				node.UnShowSub()
+			}else{
+				node.ShowSub()
+			}
 		}
+
 	})
 
 	return nodeBox
@@ -250,21 +275,21 @@ func Tree2Test() *gtk.Box{
 	nodeC := CreateNode("ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
 
 
-	nodeA1 := CreateNode("aaa111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeA2 := CreateNode("aaa112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeA3 := CreateNode("aaa113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeA1 := CreateNode("aaa111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
+	nodeA2 := CreateNode("aaa112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
+	nodeA3 := CreateNode("aaa113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
 
-	nodeB1 := CreateNode("bbb111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeB2 := CreateNode("bbb112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeB3 := CreateNode("bbb113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeB1 := CreateNode("bbb111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
+	nodeB2 := CreateNode("bbb112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
+	nodeB3 := CreateNode("bbb113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
 
-	nodeA1a := CreateNode("aaa111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeA2b := CreateNode("aaa112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeA3c := CreateNode("aaa113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeA1a := CreateNode("aaa111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+	nodeA2b := CreateNode("aaa112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+	nodeA3c := CreateNode("aaa113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
 
-	nodeB1a := CreateNode("bbb111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeB2b := CreateNode("bbb112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeB3c := CreateNode("bbb113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeB1a := CreateNode("bbb111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+	nodeB2b := CreateNode("bbb112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+	nodeB3c := CreateNode("bbb113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
 
 
 	tree.AddNode(nodeA)

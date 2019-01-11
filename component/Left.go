@@ -26,7 +26,7 @@ func CreateLeft()*gtk.Box{
 func CreateLeftDetail()*gtk.Box{
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
 
-	tree := TreeTest()
+	tree := Tree2Test()
 	box.Add(tree)
 
 	return box

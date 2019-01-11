@@ -45,4 +45,7 @@ const (
 	ConnWindowWidth = 500
 	ConnWindowHeight = 600
 
+	RightKeyWindowWidth = 50
+	RightKeyWindowHeight = 70
+
 )

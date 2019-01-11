@@ -37,11 +37,10 @@ func onActivate(application *gtk.Application) {
 	appWindow.SetDefaultSize(common.WindowWidth, common.WindowHeight)
 
 	//todo
-	appWindow.Add(component.Tree2Test())
-	//appWindow.Add(Layout())
+	appWindow.Add(Layout())
+
 	common.GlobalWin = appWindow
 	appWindow.SetPosition(gtk.WIN_POS_CENTER)
-	//appWindow.SetKeepBelow(true)
 	appWindow.SetTypeHint(gdk.WINDOW_TYPE_HINT_DIALOG)
 	appWindow.Show()
 }
