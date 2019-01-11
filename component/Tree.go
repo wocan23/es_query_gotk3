@@ -2,333 +2,294 @@ package component
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	"C"
 	"../helper"
 	"../common"
-	"C"
 )
-
-type TreeData struct{
-	item *TreeItemData // 当前数据
-	subItems []*TreeData //子数据
+/**
+ nodeBox为当前节点最外层box
+里面包含：nodeDataBox
+ */
+type Node struct{
+	nodeData *NodeData // 当前数据
+	subNodes []*Node //子数据
 	isSubShow bool // 是否展示子标签
-	isRoot bool
-	treeBox *gtk.Box // 当前对应的最外层box
+	nodeBox *gtk.Box // 当前对应的最外层box
+	nodeDataBox *gtk.Box // 当前数据box
+	nodeSubBox []*gtk.Box // 当前子节点包含层级
+	rootBox *gtk.Box // 根box
+	nodeSubEditBox *gtk.Box // 编辑box
+
+	parent *Node // 父节点
+
+	nodeLevel int // 节点级别
+
+
+	tree *Tree // 属于哪颗树
+
+}
+
+type Tree struct{
+	nodes []*Node
 	rootBox *gtk.Box
 
-	parent *TreeData
+	showStatus int // 0默认，1全部展开，2全部关闭
 }
 
-type TreeItemData struct{
+type NodeData struct{
 	data map[string]string
+	labelBox *gtk.Label
 }
 
 
 
-func (treeData *TreeData)SetProperty(k string,v string){
-	if treeData.item == nil{
-		treeData.item = new(TreeItemData)
-		treeData.item.data = make(map[string]string,0)
+func (node *Node)SetProp(k string,v string){
+	node.nodeData.data[k] = v
+}
+
+
+func CreateNode(label string,icon string)(*Node){
+	// 数据区
+	node := new(Node)
+	node.subNodes = make([]*Node,0)
+	node.nodeData = new(NodeData)
+
+	// 展示区
+	nodeBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+	node.nodeDataBox,_ = gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,-0)
+	node.nodeDataBox.Add( node.CreateNodeDataBox(label,icon))
+
+	nodeBox.Add(node.nodeDataBox)
+	node.nodeBox = nodeBox
+	return node
+}
+
+func CreateTree() (*Tree){
+	tree := new(Tree)
+	rootBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+	tree.rootBox = rootBox
+	tree.nodes = make([]*Node,0)
+	return tree
+}
+
+// 增加节点
+func (tree *Tree)AddNode(node *Node){
+	node.isSubShow = false
+	node.nodeLevel = 0
+	tree.nodes = append(tree.nodes, node)
+	tree.rootBox.Add(node.nodeBox)
+	tree.rootBox.ShowAll()
+}
+
+// 展示子节点
+func (node *Node)ShowSub(){
+	node.isSubShow = true
+	for _,subNodeBox := range node.nodeSubBox{
+		node.nodeBox.Add(subNodeBox)
 	}
-	treeData.item.data[k] = v
+	node.nodeBox.ShowAll()
 }
 
-func (treeData *TreeData)AddSubItems(subTreeData *TreeData){
-	if treeData.subItems == nil{
-		treeData.subItems = make([]*TreeData,0)
+// 关闭子节点
+func (node *Node)UnShowSub(){
+	node.isSubShow = false
+	for _,subNodeBox := range node.nodeSubBox{
+		node.nodeBox.Remove(subNodeBox)
 	}
-	treeData.subItems = append(treeData.subItems, subTreeData)
-	subTreeData.parent = treeData
-	subTreeData.rootBox = treeData.rootBox
+	node.nodeBox.ShowAll()
+}
 
-	if treeData.isRoot{
-		flushTree(treeData.rootBox,subTreeData,treeData.treeBox,GetWidget)
+// 增加子节点
+func (node *Node)AddSubNode(subNode *Node){
+	subNode.parent = node
+	subNode.rootBox = node.nodeBox
+	subNode.nodeLevel = node.nodeLevel + 1
+
+	node.subNodes = append(node.subNodes, subNode)
+
+	// subBox带缩进
+	subBox,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+	subBox.Add(fullIncidentBox(subNode.nodeBox,subNode.nodeLevel))
+	node.nodeSubBox = append(node.nodeSubBox, subBox)
+
+	if node.isSubShow{
+		// 缩紧
+		node.nodeBox.Add(subBox)
 	}
-
-
 }
 
-func (treeData *TreeData)AddSubItemAndShow(subTreeData *TreeData){
-	treeData.AddSubItems(subTreeData)
-	// 直接展示
-	subTreeData.treeBox =
-	flushTree(treeData.rootBox,subTreeData,treeData.treeBox,GetWidget)
-}
+// 移除当前节点
+func (node *Node)RemoveNode(){
 
-func (treeData *TreeData)GetRoot() *TreeData{
-	var parent *TreeData
-	for treeData.parent != nil{
-		parent = treeData.parent
-	}
-	return parent
-}
+	// 删除父节点存储的任何关联
+	parent := node.parent
 
-func CreateTreeRoot()(*TreeData,*gtk.Box){
-	treeData := new(TreeData)
-	treeData.isRoot = true
-	treeBox := CreateTreeByData(treeData,GetWidget)
-	treeData.rootBox = treeBox
-	treeData.treeBox = treeBox
-	return treeData,treeBox
-}
-
-func CreateTreeData()*TreeData{
-	return new(TreeData)
-}
-
-func CreateTreeByData(data *TreeData,getWidget func(data *TreeData,root *gtk.Box,parent *gtk.Box)gtk.IWidget) *gtk.Box {
-	box, _ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL, 0)
-	//box.SetSizeRequest(common.WindowLeftWidth,common.WindowLeftHeight)
-	box.SetBorderWidth(0)
-	flushTree(box,data,box,getWidget)
-	return box
-
-}
-
-func flushTree(root *gtk.Box,data *TreeData,parent *gtk.Box,getWidget func(data *TreeData,root *gtk.Box,parent *gtk.Box)gtk.IWidget) *gtk.Box{
-	// 第一层直接遍历子
-	curBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
-
-	if !data.isRoot{
-		widget := getWidget(data,root,curBox)
-		curBox.Add(widget)
+	// 查询子位置
+	var subIndex = -1
+	for i,e := range parent.subNodes{
+		if e == node{
+			subIndex = i
+		}
 	}
 
-	parent.Add(curBox)
+	if subIndex != -1{
+		// 移除子节点视图
+		parent.nodeSubBox = append(parent.nodeSubBox[:subIndex],parent.nodeSubBox[subIndex+1:]...)
+		// 移除子节点
+		parent.subNodes = append(parent.subNodes[:subIndex],parent.subNodes[subIndex+1:]...)
+	}
+	node.parent = nil
+	node.tree = nil
+	node.nodeData = nil
 
-	return curBox
+	node.nodeBox.Destroy()
 }
 
-func GetWidget(data *TreeData,root *gtk.Box,current *gtk.Box) gtk.IWidget{
-	text := data.item.data["text"]
-	imagePath := data.item.data["imagePath"]
-	btn,_ := gtk.EventBoxNew()
-	btn.SetSizeRequest(100,30)
 
-	btn.SetHExpand(false)
+// 编辑已有节点
+func (node *Node)EditNodeBox(){
+	editBox := CreateEditNodeBox(node.nodeData.data["label"],node.nodeData.data["icon"])
+	RemoveChildren(node.nodeDataBox)
+	node.nodeDataBox.Add(editBox)
+}
 
-	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
-	var level = checkLevel(data)
-	for i := 0; i < level; i++{
-		_,height := box.GetSizeRequest()
-		label,_ := gtk.LabelNew(" ")
-		label.SetSizeRequest(10,height)
-		box.Add(label)
-	}
-	box.SetHExpand(false)
+// 编辑完替换
+func (node *Node)EndEditNodeBox(label string,icon string){
+	RemoveChildren(node.nodeDataBox)
+	node.nodeDataBox.Add(node.CreateNodeDataBox(label,icon))
+}
 
-	image := helper.CreateImage(common.TreeItemWidth,common.TreeItemHeight,imagePath)
+// 添加编辑节点
+func (node *Node)AddEditNodeBox(label string,icon string){
+
+	editSubNodeBox := CreateEditNodeBox(label,icon)
+
+	node.nodeSubEditBox = fullIncidentBox(editSubNodeBox,node.nodeLevel+1)
+
+	node.nodeSubBox = append(node.nodeSubBox, node.nodeSubEditBox)
+
+	node.nodeBox.Add(node.nodeSubEditBox)
+
+	node.nodeBox.ShowAll()
+}
+
+// 移除编辑替换节点
+func (node *Node)RemoveEditNodeBox(){
+	node.nodeBox.Remove(node.nodeSubEditBox)
+	node.nodeSubBox = node.nodeSubBox[:len(node.nodeSubBox)-1]
+	node.nodeSubEditBox.Destroy()
+	node.nodeSubEditBox = nil
+}
+
+func CreateEditNodeBox(label string,icon string) *gtk.Box{
+	nodeBox,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+
+	image := helper.CreateImage(common.TreeItemWidth,common.TreeItemHeight,icon)
+	labelEntity,_ := gtk.EntryNew()
+	labelEntity.SetText(label)
+
+	nodeBox.Add(image)
+	nodeBox.Add(labelEntity)
+
+	return nodeBox
+}
+
+func (node *Node)CreateNodeDataBox(label string,icon string)(*gtk.Box){
+
+	nodeBox,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+	eventBox,_ := gtk.EventBoxNew()
+	nodeBox1,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+
+	image := helper.CreateImage(common.TreeItemWidth,common.TreeItemHeight,icon)
+	textLabel,_ := gtk.LabelNew(label)
+
+	nodeBox1.Add(image)
+	nodeBox1.Add(textLabel)
+
+	eventBox.Add(nodeBox1)
+	nodeBox.Add(eventBox)
 
 
-	textV,_ := gtk.LabelNew(text)
-
-	//var fixed *gtk.Fixed
-
-	//textV.Connect("enter_notify_event", func(v gtk.Label) {
-	//	fixed,_ = gtk.FixedNew()
-	//	t,_ := gtk.LabelNew(text)
-	//	fixed.Add(t)
-	//})
-	//textV.Connect("leave_notify_event", func(v gtk.Label) {
-	//
-	//})
-
-
-	entity,_ := gtk.EntryNew()
-	entity.SetTooltipText(text)
-	entity.SetVisible(false)
-
-	box.Add(image)
-	box.Add(textV)
-
-
-	// 点击事件
-	btn.Connect("button_press_event", func(e *gtk.EventBox) {
-		data.isSubShow = !data.isSubShow
-		if data.isSubShow{
-			showSubItems(data,root,current)
+	eventBox.Connect("button_press_event", func(box *gtk.EventBox) {
+		if node.isSubShow{
+			node.UnShowSub()
 		}else{
-			unShowSubItems(current)
+			node.ShowSub()
 		}
 	})
 
-	btn.SetCanFocus(true)
+	return nodeBox
+}
 
-	btn.Connect("enter_notify_event", func(e *gtk.EventBox) {
-		changeBgColor(e)
+func RemoveChildren(box *gtk.Box){
+	children := box.GetChildren()
+	children.Foreach(func(subBoxI interface{}) {
+		subBox := subBoxI.(*gtk.Box)
+		box.Remove(subBox)
 	})
 
-	btn.Connect("leave_notify_event", func(e *gtk.EventBox) {
-		clearBgColor(e)
-	})
-
-	btn.Add(box)
-	btn.ShowAll()
-
-	return btn
 }
 
-func changeBgColor(btn *gtk.EventBox){
-	// 染色
-	cssProvider,_ := gtk.CssProviderNew()
-	cssProvider.LoadFromData(`.clicked{
-			background-color:#87CEFA;
-		}`)
-	screen,_ := btn.GetScreen()
-	style,_ := btn.GetStyleContext()
-	gtk.AddProviderForScreen(screen,cssProvider,1)
-
-	style.AddClass("clicked")
-}
-
-func clearBgColor(btn *gtk.EventBox){
-	style,_ := btn.GetStyleContext()
-
-	style.RemoveClass("clicked")
-}
-
-func showSubItems(data *TreeData,root *gtk.Box,current *gtk.Box){
-	for _, e := range data.subItems {
-		pBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
-
-		widget := GetWidget(e,root,pBox)
-
-		pBox.Add(widget)
-		current.Add(pBox)
+func fullIncidentBox(box *gtk.Box, num int) *gtk.Box{
+	incidentBox,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+	for i := 0; i < num; i++{
+		ilabel,_ := gtk.LabelNew("  ")
+		incidentBox.Add(ilabel)
 	}
-	current.ShowAll()
-}
-
-func unShowSubItems(current *gtk.Box){
-	list := current.GetChildren()
-	var length = list.Length()
-	var i uint
-	for i = 1 ; i < length; i ++{
-		item := list.NthData(i)
-		widget := item.(*gtk.Widget)
-		widget.Destroy()
-	}
-	current.Show()
-}
-
-func checkLevel(data *TreeData)int{
-	var i = 0
-	parent := data.parent
-	for parent != nil{
-		parent = parent.parent
-		i ++
-	}
-	return i
+	incidentBox.Add(box)
+	return incidentBox
 }
 
 
 
-func TreeTest()*gtk.Box{
+func Tree2Test() *gtk.Box{
+	tree := CreateTree()
 
-	// 数据
-	d1,box := CreateTreeRoot()
-
-	d11 := CreateTreeData()
-	d12 := CreateTreeData()
-	d13 := CreateTreeData()
-	d111 := CreateTreeData()
+	nodeA := CreateNode("aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeB := CreateNode("bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeC := CreateNode("ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
 
 
-	d121 := CreateTreeData()
-	d122 := CreateTreeData()
+	nodeA1 := CreateNode("aaa111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeA2 := CreateNode("aaa112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeA3 := CreateNode("aaa113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
 
-	d131 := CreateTreeData()
-	d132 := CreateTreeData()
-	d133 := CreateTreeData()
+	nodeB1 := CreateNode("bbb111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeB2 := CreateNode("bbb112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeB3 := CreateNode("bbb113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
 
-	d1.SetProperty("text","d1")
-	d1.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	d11.SetProperty("text","d11")
-	d11.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	d12.SetProperty("text","d12")
-	d12.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	d13.SetProperty("text","d13")
-	d13.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	d111.SetProperty("text","d111")
-	d111.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	d121.SetProperty("text","d121")
-	d121.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	d122.SetProperty("text","d122")
-	d122.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	d131.SetProperty("text","d131")
-	d131.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	d132.SetProperty("text","d132")
-	d132.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	d133.SetProperty("text","d133")
-	d133.SetProperty("imagePath","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+	nodeA1a := CreateNode("aaa111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeA2b := CreateNode("aaa112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeA3c := CreateNode("aaa113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
 
-	d1.AddSubItems(d11)
-	d1.AddSubItems(d12)
-	d1.AddSubItems(d13)
+	nodeB1a := CreateNode("bbb111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeB2b := CreateNode("bbb112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeB3c := CreateNode("bbb113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
 
 
-	d11.AddSubItems(d111)
+	tree.AddNode(nodeA)
+	tree.AddNode(nodeB)
+	tree.AddNode(nodeC)
 
-	d12.AddSubItems(d121)
-	d12.AddSubItems(d122)
+	nodeA.AddSubNode(nodeA1)
+	nodeA.AddSubNode(nodeA2)
+	nodeA.AddSubNode(nodeA3)
 
-	d13.AddSubItems(d131)
-	d13.AddSubItems(d132)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d131)
-	d13.AddSubItems(d132)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d131)
-	d13.AddSubItems(d132)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d131)
-	d13.AddSubItems(d132)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
-	d13.AddSubItems(d133)
+	nodeB.AddSubNode(nodeB1)
+	nodeB.AddSubNode(nodeB2)
+	nodeB.AddSubNode(nodeB3)
 
+	nodeA1.AddSubNode(nodeA1a)
+	nodeA2.AddSubNode(nodeA2b)
+	nodeA3.AddSubNode(nodeA3c)
 
-	return box
+	nodeB1.AddSubNode(nodeB1a)
+	nodeB2.AddSubNode(nodeB2b)
+	nodeB3.AddSubNode(nodeB3c)
 
+	tree.rootBox.ShowAll()
+	return tree.rootBox
 }
+
+
+
