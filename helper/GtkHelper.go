@@ -4,7 +4,6 @@ import (
 	"log"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/gotk3/gotk3/gdk"
-	"fmt"
 )
 
 func CreateWindow(title string,width int,height int) *gtk.Window{
@@ -40,17 +39,28 @@ func SetSize(widget gtk.IWidget,width int, height int){
 	widget.Set("height",height)
 }
 
-func ChangeBgColor(id string,widget *gtk.Box,rgb string){
-	fmt.Println(widget)
+func ChangeBgColor(id string,widget *gtk.Widget,rgb string){
 		// 染色
-		cssProvider,_ := gtk.CssProviderNew()
-		cssProvider.LoadFromData("."+id+"{ background-color:"+rgb+";}")
-		screen,_ := widget.GetScreen()
-		style,_ := widget.GetStyleContext()
-		gtk.AddProviderForScreen(screen,cssProvider,1)
+	cssProvider,_ := gtk.CssProviderNew()
+	cssProvider.LoadFromData("."+id+"{ background-color:"+rgb+";}")
+	screen,_ := widget.GetScreen()
+	style,_ := widget.GetStyleContext()
+	gtk.AddProviderForScreen(screen,cssProvider,1)
 
-		style.AddClass(id)
+	style.AddClass(id)
 }
+
+func ChangeMeunBgColor(id string,widget *gtk.Menu,rgb string){
+	// 染色
+	cssProvider,_ := gtk.CssProviderNew()
+	cssProvider.LoadFromData("."+id+"{ background-color:"+rgb+";}")
+	screen,_ := widget.GetScreen()
+	style,_ := widget.GetStyleContext()
+	gtk.AddProviderForScreen(screen,cssProvider,3)
+
+	style.AddClass(id)
+}
+
 
 func RemoveAndAddNew(curBox *gtk.Box,newBox *gtk.Box){
 	curBox.GetChildren().Foreach(func(item interface{}) {

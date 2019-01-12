@@ -4,7 +4,6 @@ import (
 	"../common"
 	//"../helper"
 	"github.com/gotk3/gotk3/gtk"
-	"fmt"
 )
 
 var connFlag = false
@@ -15,12 +14,12 @@ func CreateHeader() *gtk.Box{
 	menu,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,5)
 
 
-	connBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"conn","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	indexBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"index","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	docBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"doc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	editBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"edit","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/editDoc.png")
-	addBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"add","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/addDoc.png")
-	searchBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"search","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/search.png")
+	connBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"conn",common.ConnImagePath)
+	indexBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"index",common.IndexImagePath)
+	docBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"doc",common.DocImagePath)
+	editBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"edit",common.EditDocImagePath)
+	addBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"add",common.AddDocImagePath)
+	searchBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"search",common.SearchDocImagePath)
 
 	connBtn.Connect("button_press_event",connClickCallback)
 
@@ -40,25 +39,23 @@ func CreateHeader() *gtk.Box{
 }
 
 func connClickCallback(btn *gtk.Button){
-	fmt.Println("click conn")
-	common.GlobalWin.SetKeepBelow(true)
 
 	connWin,_ :=  gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	connWin.SetKeepAbove(true)
 	connWin.SetFocusVisible(true)
 	connWin.SetPosition(gtk.WIN_POS_CENTER)
-	connWin.SetTitle("新建连接")
+	connWin.SetTitle("create connection")
+	connWin.SetTransientFor(common.GlobalWin)
+	connWin.SetModal(true)
 	connWin.SetSizeRequest(common.ConnWindowWidth,common.ConnWindowHeight)
 
-	label,_ := gtk.LabelNew("dfsdf")
+	label,_ := gtk.LabelNew("test")
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
 	box.Add(label)
 	connWin.Add(box)
-	//
+
 	connWin.ShowAll()
-	connWin.Connect("destroy", func() {
-		common.GlobalWin.SetKeepBelow(false)
-	})
+
 
 }
 

@@ -6,6 +6,7 @@ import (
 	"../helper"
 	"../common"
 	"github.com/gotk3/gotk3/gdk"
+	"fmt"
 )
 /**
  nodeBox为当前节点最外层box
@@ -54,6 +55,9 @@ func CreateNode(label string,icon string)(*Node){
 	node := new(Node)
 	node.subNodes = make([]*Node,0)
 	node.nodeData = new(NodeData)
+	node.nodeData.data = make(map[string]string,0)
+	node.nodeData.data["label"] = label
+	node.nodeData.data["icon"] = icon
 
 	// 展示区
 	nodeBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
@@ -149,7 +153,7 @@ func (node *Node)RemoveNode(){
 
 // 编辑已有节点
 func (node *Node)EditNodeBox(){
-	editBox := CreateEditNodeBox(node.nodeData.data["label"],node.nodeData.data["icon"])
+	editBox := node.CreateEditNodeBox(node.nodeData.data["label"],node.nodeData.data["icon"])
 	RemoveChildren(node.nodeDataBox)
 	node.nodeDataBox.Add(editBox)
 }
@@ -163,7 +167,7 @@ func (node *Node)EndEditNodeBox(label string,icon string){
 // 添加编辑节点
 func (node *Node)AddEditNodeBox(label string,icon string){
 
-	editSubNodeBox := CreateEditNodeBox(label,icon)
+	editSubNodeBox := node.CreateEditNodeBox(label,icon)
 
 	node.nodeSubEditBox = fullIncidentBox(editSubNodeBox,node.nodeLevel+1)
 
@@ -182,7 +186,7 @@ func (node *Node)RemoveEditNodeBox(){
 	node.nodeSubEditBox = nil
 }
 
-func CreateEditNodeBox(label string,icon string) *gtk.Box{
+func (node *Node)CreateEditNodeBox(label string,icon string) *gtk.Box{
 	nodeBox,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
 
 	image := helper.CreateImage(common.TreeItemWidth,common.TreeItemHeight,icon)
@@ -191,6 +195,13 @@ func CreateEditNodeBox(label string,icon string) *gtk.Box{
 
 	nodeBox.Add(image)
 	nodeBox.Add(labelEntity)
+	nodeBox.ShowAll()
+
+	labelEntity.Connect("focus_out_event", func() {
+		fmt.Println("out")
+		newLabel,_ := labelEntity.GetText()
+		node.EndEditNodeBox(newLabel,icon)
+	})
 
 	return nodeBox
 }
@@ -222,16 +233,8 @@ func (node *Node)CreateNodeDataBox(label string,icon string)(*gtk.Box){
 		 */
 		switch eventButton.Button() {
 		case 3:
-			// 打开窗口
-			rightWindow,_ := gtk.WindowNew(gtk.WINDOW_POPUP)
-			// 获取鼠标位置
-			x := eventButton.X()
-			y := eventButton.Y()
-			rightWindow.SetMarginStart(int(x))
-			rightWindow.SetMarginTop(int(y))
-			rightWindow.SetSizeRequest(common.RightKeyWindowWidth,common.RightKeyWindowHeight)
-			rightWindow.SetResizable(false)
-			rightWindow.ShowAll()
+			// 鼠标右键
+			bindMouseRightButton(node,eventButton)
 		case 1:
 			// 左键展开/关闭
 			if node.isSubShow{
@@ -243,13 +246,14 @@ func (node *Node)CreateNodeDataBox(label string,icon string)(*gtk.Box){
 
 	})
 
+	nodeBox.ShowAll()
 	return nodeBox
 }
 
 func RemoveChildren(box *gtk.Box){
 	children := box.GetChildren()
 	children.Foreach(func(subBoxI interface{}) {
-		subBox := subBoxI.(*gtk.Box)
+		subBox := subBoxI.(*gtk.Widget)
 		box.Remove(subBox)
 	})
 
@@ -270,26 +274,26 @@ func fullIncidentBox(box *gtk.Box, num int) *gtk.Box{
 func Tree2Test() *gtk.Box{
 	tree := CreateTree()
 
-	nodeA := CreateNode("aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeB := CreateNode("bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
-	nodeC := CreateNode("ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png")
+	nodeA := CreateNode("aaa",common.ConnImagePath)
+	nodeB := CreateNode("bbb",common.ConnImagePath)
+	nodeC := CreateNode("ccc",common.ConnImagePath)
 
 
-	nodeA1 := CreateNode("aaa111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	nodeA2 := CreateNode("aaa112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	nodeA3 := CreateNode("aaa113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
+	nodeA1 := CreateNode("aaa111",common.IndexImagePath)
+	nodeA2 := CreateNode("aaa112",common.IndexImagePath)
+	nodeA3 := CreateNode("aaa113",common.IndexImagePath)
 
-	nodeB1 := CreateNode("bbb111","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	nodeB2 := CreateNode("bbb112","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
-	nodeB3 := CreateNode("bbb113","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png")
+	nodeB1 := CreateNode("bbb111",common.IndexImagePath)
+	nodeB2 := CreateNode("bbb112",common.IndexImagePath)
+	nodeB3 := CreateNode("bbb113",common.IndexImagePath)
 
-	nodeA1a := CreateNode("aaa111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	nodeA2b := CreateNode("aaa112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	nodeA3c := CreateNode("aaa113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+	nodeA1a := CreateNode("aaa111aaa",common.DocImagePath)
+	nodeA2b := CreateNode("aaa112bbb",common.DocImagePath)
+	nodeA3c := CreateNode("aaa113ccc",common.DocImagePath)
 
-	nodeB1a := CreateNode("bbb111aaa","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	nodeB2b := CreateNode("bbb112bbb","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
-	nodeB3c := CreateNode("bbb113ccc","/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png")
+	nodeB1a := CreateNode("bbb111aaa",common.DocImagePath)
+	nodeB2b := CreateNode("bbb112bbb",common.DocImagePath)
+	nodeB3c := CreateNode("bbb113ccc",common.DocImagePath)
 
 
 	tree.AddNode(nodeA)
@@ -314,6 +318,38 @@ func Tree2Test() *gtk.Box{
 
 	tree.rootBox.ShowAll()
 	return tree.rootBox
+}
+
+// 打开鼠标右键
+func bindMouseRightButton(node *Node,eventButton *gdk.EventButton){
+
+	rightMenu,_ := gtk.MenuNew()
+
+	helper.ChangeMeunBgColor("menu",rightMenu,"#0f0")
+
+	seeItem,_ := gtk.MenuItemNewWithLabel("see")
+	addItem,_ := gtk.MenuItemNewWithLabel("add")
+	editItem,_ := gtk.MenuItemNewWithLabel("edit")
+	sepItem,_ := gtk.SeparatorMenuItemNew()
+
+	seeItem.Connect("button_press_event", func() {
+
+	})
+	addItem.Connect("button_press_event", func() {
+
+	})
+	editItem.Connect("button_press_event", func() {
+		node.EditNodeBox()
+	})
+
+	rightMenu.Append(seeItem)
+	rightMenu.Append(addItem)
+	rightMenu.Append(sepItem)
+	rightMenu.Append(editItem)
+	rightMenu.ShowAll()
+
+	rightMenu.PopupAtPointer(eventButton.Event)
+
 }
 
 

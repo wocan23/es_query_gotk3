@@ -42,10 +42,18 @@ const (
 
 	BarImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png"
 
-	ConnWindowWidth = 500
-	ConnWindowHeight = 600
+	ConnWindowWidth = 300
+	ConnWindowHeight = 500
 
-	RightKeyWindowWidth = 50
-	RightKeyWindowHeight = 70
+	RightKeyWindowWidth = 150
+	RightKeyWindowHeight = 170
+
+
+	ConnImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/conn.png"
+	IndexImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/index.png"
+	DocImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/doc.png"
+	AddDocImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/addDoc.png"
+	EditDocImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/editDoc.png"
+	SearchDocImagePath = "/Users/zhaoshuai/Documents/go_workspace_wocan/es_query_gotk3/images/search.png"
 
 )
