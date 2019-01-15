@@ -3,6 +3,7 @@ package component
 import (
 	"../common"
 	"github.com/gotk3/gotk3/gtk"
+	common2 "github.com/itgeniusshuai/go_common/common"
 )
 
 var connFlag = false
@@ -46,7 +47,7 @@ func connClickCallback(btn *gtk.Button){
 	connWin.SetTitle("create connection")
 	connWin.SetTransientFor(GlobalWin)
 	connWin.SetModal(true)
-	connWin.SetSizeRequest(common.ConnWindowWidth,common.ConnWindowHeight)
+	//connWin.SetSizeRequest(common.ConnWindowWidth,common.ConnWindowHeight)
 
 	box,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
 
@@ -60,6 +61,9 @@ func connClickCallback(btn *gtk.Button){
 	formItemBox.Add(portBox)
 	formItemBox.SetMarginTop(20)
 	formItemBox.SetMarginStart(20)
+	formItemBox.SetMarginBottom(20)
+	formItemBox.SetMarginEnd(20)
+
 
 
 	commitBtn,_ := gtk.ButtonNewWithLabel("确定")
@@ -73,16 +77,28 @@ func connClickCallback(btn *gtk.Button){
 			dialog := gtk.MessageDialogNew(connWin,gtk.DIALOG_MODAL,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"ip不能为空")
 			dialog.Show()
 			return
+		}else{
+			LastIp = ip
 		}
 		if port =="" {
 			dialog := gtk.MessageDialogNew(connWin,gtk.DIALOG_MODAL,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"port不能为空")
 			dialog.Show()
 			return
+		}else{
+			isInt,_ := common2.IsInt(port)
+			if !isInt{
+				dialog := gtk.MessageDialogNew(connWin,gtk.DIALOG_MODAL,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"port不是合法数字")
+				dialog.Show()
+				return
+			}
+			LastPort = port
 		}
 		if name =="" {
 			dialog := gtk.MessageDialogNew(connWin,gtk.DIALOG_MODAL,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"name不能为空")
 			dialog.ShowAll()
 			return
+		}else{
+			LastName = name
 		}
 		CreateEsConn(name,ip+":"+port)
 		// todo user action

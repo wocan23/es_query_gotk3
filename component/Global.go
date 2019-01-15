@@ -14,4 +14,8 @@ var (
 
 
 	LeftTree *Tree
+
+	LastIp string
+	LastPort string
+	LastName string
 )
