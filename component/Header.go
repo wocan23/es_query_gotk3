@@ -70,10 +70,19 @@ func connClickCallback(btn *gtk.Button){
 		port,_ := portEntry.GetText()
 		name,_ := nameEntry.GetText()
 		if ip =="" {
+			dialog := gtk.MessageDialogNew(connWin,gtk.DIALOG_MODAL,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"ip不能为空")
+			dialog.Show()
+			return
 		}
 		if port =="" {
+			dialog := gtk.MessageDialogNew(connWin,gtk.DIALOG_MODAL,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"port不能为空")
+			dialog.Show()
+			return
 		}
 		if name =="" {
+			dialog := gtk.MessageDialogNew(connWin,gtk.DIALOG_MODAL,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"name不能为空")
+			dialog.ShowAll()
+			return
 		}
 		CreateEsConn(name,ip+":"+port)
 		// todo user action
