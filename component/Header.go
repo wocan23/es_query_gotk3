@@ -2,7 +2,6 @@ package component
 
 import (
 	"../common"
-	//"../helper"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -21,6 +20,7 @@ func CreateHeader() *gtk.Box{
 	addBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"add",common.AddDocImagePath)
 	searchBtn := CreateNavItem(common.NavItemWidth,common.NavItemHeight,"search",common.SearchDocImagePath)
 
+	// 新建连接
 	connBtn.Connect("button_press_event",connClickCallback)
 
 	menu.Add(connBtn)
@@ -30,8 +30,7 @@ func CreateHeader() *gtk.Box{
 	menu.Add(addBtn)
 	menu.Add(searchBtn)
 
-	//helper.ChangeBgColor(menu,"#ff00f0")
-	//helper.ChangeBgColor(box,"#00ff00")
+
 
 	box.Add(menu)
 	box.ShowAll()
@@ -45,17 +44,68 @@ func connClickCallback(btn *gtk.Button){
 	connWin.SetFocusVisible(true)
 	connWin.SetPosition(gtk.WIN_POS_CENTER)
 	connWin.SetTitle("create connection")
-	connWin.SetTransientFor(common.GlobalWin)
+	connWin.SetTransientFor(GlobalWin)
 	connWin.SetModal(true)
 	connWin.SetSizeRequest(common.ConnWindowWidth,common.ConnWindowHeight)
 
-	label,_ := gtk.LabelNew("test")
-	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
-	box.Add(label)
+	box,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
+
+	nameBox,nameEntry := createFormItem("name")
+	ipBox,ipEntry := createFormItem("ip")
+	portBox,portEntry := createFormItem("port")
+
+	formItemBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,10)
+	formItemBox.Add(nameBox)
+	formItemBox.Add(ipBox)
+	formItemBox.Add(portBox)
+	formItemBox.SetMarginTop(20)
+	formItemBox.SetMarginStart(20)
+
+
+	commitBtn,_ := gtk.ButtonNewWithLabel("确定")
+	commitBtn.SetMarginTop(10)
+	commitBtn.SetSizeRequest(30,20)
+	commitBtn.Connect("button_press_event", func() {
+		ip,_ := ipEntry.GetText()
+		port,_ := portEntry.GetText()
+		name,_ := nameEntry.GetText()
+		if ip =="" {
+		}
+		if port =="" {
+		}
+		if name =="" {
+		}
+		CreateEsConn(name,ip+":"+port)
+		// todo user action
+		connWin.Destroy()
+	})
+
+	box.Add(formItemBox)
+	box.Add(commitBtn)
 	connWin.Add(box)
 
 	connWin.ShowAll()
 
-
 }
+
+// 新建连接
+func CreateEsConn(name string,url string){
+	connNode := CreateNode(name,common.ConnImagePath)
+	connNode.SetProp("conn",url)
+	LeftTree.AddNode(connNode)
+}
+
+func createFormItem(labelText string)(*gtk.Box,*gtk.Entry){
+	box,_ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL,0)
+
+	label,_ := gtk.LabelNew(labelText)
+	label.SetWidthChars(10)
+	labelValue,_ := gtk.EntryNew()
+	box.Add(label)
+	box.Add(labelValue)
+
+	return box,labelValue
+}
+
+
 

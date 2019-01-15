@@ -41,6 +41,9 @@ type Tree struct{
 type NodeData struct{
 	data map[string]string
 	labelBox *gtk.Label
+
+	label string
+	icon string
 }
 
 
@@ -56,8 +59,8 @@ func CreateNode(label string,icon string)(*Node){
 	node.subNodes = make([]*Node,0)
 	node.nodeData = new(NodeData)
 	node.nodeData.data = make(map[string]string,0)
-	node.nodeData.data["label"] = label
-	node.nodeData.data["icon"] = icon
+	node.nodeData.icon = icon
+	node.nodeData.label = label
 
 	// 展示区
 	nodeBox,_ := gtk.BoxNew(gtk.ORIENTATION_VERTICAL,0)
@@ -153,7 +156,7 @@ func (node *Node)RemoveNode(){
 
 // 编辑已有节点
 func (node *Node)EditNodeBox(){
-	editBox := node.CreateEditNodeBox(node.nodeData.data["label"],node.nodeData.data["icon"])
+	editBox := node.CreateEditNodeBox(node.nodeData.label,node.nodeData.icon)
 	RemoveChildren(node.nodeDataBox)
 	node.nodeDataBox.Add(editBox)
 }
@@ -162,6 +165,10 @@ func (node *Node)EditNodeBox(){
 func (node *Node)EndEditNodeBox(label string,icon string){
 	RemoveChildren(node.nodeDataBox)
 	node.nodeDataBox.Add(node.CreateNodeDataBox(label,icon))
+
+	// 数据区
+	node.nodeData.data["label"] = label
+	node.nodeData.label = label
 }
 
 // 添加编辑节点
@@ -191,14 +198,24 @@ func (node *Node)CreateEditNodeBox(label string,icon string) *gtk.Box{
 
 	image := helper.CreateImage(common.TreeItemWidth,common.TreeItemHeight,icon)
 	labelEntity,_ := gtk.EntryNew()
+	//labelEntity.SetCanFocus(true)
 	labelEntity.SetText(label)
+	labelEntity.SetVisibility(true)
 
 	nodeBox.Add(image)
 	nodeBox.Add(labelEntity)
 	nodeBox.ShowAll()
 
-	labelEntity.Connect("focus_out_event", func() {
-		fmt.Println("out")
+	//labelEntity.Connect("focus_out_event", func() {
+	//	//fmt.Println("test entry event")
+	//	newLabel,_ := labelEntity.GetText()
+	//	node.EndEditNodeBox(newLabel,icon)
+	//	fmt.Println("test")
+	//})
+
+
+	labelEntity.Connect("activate", func() {
+		fmt.Println("active")
 		newLabel,_ := labelEntity.GetText()
 		node.EndEditNodeBox(newLabel,icon)
 	})
@@ -271,7 +288,7 @@ func fullIncidentBox(box *gtk.Box, num int) *gtk.Box{
 
 
 
-func Tree2Test() *gtk.Box{
+func Tree2Test() *Tree{
 	tree := CreateTree()
 
 	nodeA := CreateNode("aaa",common.ConnImagePath)
@@ -288,6 +305,7 @@ func Tree2Test() *gtk.Box{
 	nodeB3 := CreateNode("bbb113",common.IndexImagePath)
 
 	nodeA1a := CreateNode("aaa111aaa",common.DocImagePath)
+	nodeA1a.SetProp("conn","/")
 	nodeA2b := CreateNode("aaa112bbb",common.DocImagePath)
 	nodeA3c := CreateNode("aaa113ccc",common.DocImagePath)
 
@@ -317,7 +335,7 @@ func Tree2Test() *gtk.Box{
 	nodeB3.AddSubNode(nodeB3c)
 
 	tree.rootBox.ShowAll()
-	return tree.rootBox
+	return tree
 }
 
 // 打开鼠标右键
